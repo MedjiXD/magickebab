@@ -1,53 +1,622 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="hr">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#050505">
-<title>Stranica je u izradi</title>
+<meta charset="UTF-8">
+
+<!-- ================================================================
+     IMAGE VARIABLES - sve slike stranice, definirane na jednom mjestu.
+     Sve putanje su LOKALNE: slike se nalaze u mapi "images/" koja mora
+     ostati pored ove index.html datoteke. Da zamijenite bilo koju
+     sliku na stranici, samo promijenite putanju ovdje (desno od ":").
+     ================================================================ -->
+<script>
+  const IMAGES = {
+    LOGO:        'images/logo.svg',        // Grb / logo - koristi se MALI u navigaciji (gore lijevo) i VELIKI u K1 hero sekciji. Isti fajl, samo drukčija veličina (CSS).
+    K1_HERO_BG:  'images/hero.png',  // K1 - pozadinska ilustracija hero sekcije (3 ražnja na roštilju)
+    K2_MENU:  'images/K2-menu.jpg',   // K2 - slika cijelog jelovnika (naslovna sekcija menija)
+    K4_STORE: 'images/K4-store.jpg',  // K4 - fotografija objekta/trgovine (uz lokaciju na karti)
+
+    // K5 - fond slika za galeriju "Kebabi". Može ih biti i više od 4 -
+    // prikazuju se po 4 odjednom, ostatak ide na sljedeći slide.
+    // Dodajte nove retke ovdje pa ih upišite i u GALLERY_POOLS.kebab niže.
+    K5_1: 'images/K5-1.jpg',
+    K5_2: 'images/K5-2.jpg',
+    K5_3: 'images/K5-3.jpg',
+    K5_4: 'images/K5-4.jpg',
+    K5_5: 'images/K5-5.jpg',
+    K5_6: 'images/K5-6.jpg',
+
+    // K5 - fond slika za galeriju "Burgeri" (isti princip kao gore).
+    K5_7:  'images/K5-7.jpg',
+    K5_8:  'images/K5-8.jpg',
+    K5_9:  'images/K5-9.jpg',
+    K5_10: 'images/K5-10.jpg',
+    K5_11: 'images/K5-11.jpg',
+    K5_12: 'images/K5-12.jpg',
+  };
+
+  // Koje IMAGES varijable pripadaju kojoj K5 galeriji. Poredak ovdje NIJE
+  // bitan - redoslijed se nasumično miješa (shuffle) svaki put kad se
+  // stranica učita, pa se prikazuje po 4 slike po slideu.
+  const GALLERY_POOLS = {
+    kebab:  ['K5_1', 'K5_2', 'K5_3', 'K5_4', 'K5_5', 'K5_6'],
+    burger: ['K5_7', 'K5_8', 'K5_9', 'K5_10', 'K5_11', 'K5_12'],
+  };
+
+  // Kratak opis za svaku K5 sliku - prikazuje se u zamagljenoj traci na
+  // dnu svakog okvira. Uredite tekst ovdje kad zamijenite placeholder slike.
+  const K5_CAPTIONS = {
+    K5_1: 'Classic kebab junetina u lepinji',
+    K5_2: 'Pileći kebab u tortilji',
+    K5_3: 'Kebab salata s domaćim umakom',
+    K5_4: 'Classic kebab menu s pomfritom',
+    K5_5: 'Pileći kebab sa svježim povrćem',
+    K5_6: 'Kebab u mekoj tortilji',
+    K5_7: 'Klasični hamburger',
+    K5_8: 'Cheeseburger sa sirom',
+    K5_9: 'Bacon burger s hrskavom slaninom',
+    K5_10: 'Bacon cheese burger',
+    K5_11: 'Gurmanska pljeskavica u lepinji',
+    K5_12: 'Burger meni s pomfritom i pićem',
+  };
+</script>
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Magic Kebab i Burger - Sesvete</title>
+<meta name="description" content="Magic Kebab i Burger - najbolji okusi u Sesvetama. Kebabi, burgeri, pljeskavice. Naruči odmah preko WhatsAppa.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Permanent+Marker&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-*{box-sizing:border-box}html,body{margin:0;min-height:100%;background:#050505;color:#fff;font-family:Arial,Helvetica,sans-serif}
-body{min-height:100vh;min-height:100dvh;display:grid;place-items:center;overflow:hidden;position:relative;background:radial-gradient(circle at 50% 38%,rgba(242,10,10,.10),transparent 35%),#050505}
-body:before{content:"";position:absolute;inset:0;opacity:.035;background-image:linear-gradient(#fff 1px,transparent 1px),linear-gradient(90deg,#fff 1px,transparent 1px);background-size:44px 44px}
-.page{position:relative;z-index:2;text-align:center;width:min(90vw,800px);padding-bottom:120px}
-.logo{width:min(24vw,300px);margin:auto;filter:drop-shadow(0 0 10px rgba(242,10,10,.18));animation:float 4s ease-in-out infinite}
-.logo svg{width:100%;height:auto;display:block}
-h1{margin:25px 0 8px;font-size:clamp(30px,5vw,52px);font-weight:900;text-transform:uppercase;letter-spacing:.03em}
-h1 span{color:#f20a0a}.sub{margin:0;color:#aaa;font-size:clamp(15px,2vw,20px);letter-spacing:.12em;text-transform:uppercase}.line{width:85px;height:3px;background:#f20a0a;border-radius:4px;margin:24px auto;box-shadow:0 0 18px #f20a0a55}
-.scene{position:absolute;z-index:3;bottom:0;left:0;width:100%;height:145px;pointer-events:none}.ground{position:absolute;bottom:0;width:100%;height:4px;background:#1d1d1d;border-top:1px solid #f20a0a66}
-.exc{position:absolute;bottom:7px;left:-220px;width:235px;height:125px;animation:drive 15s linear infinite}
-.track{position:absolute;bottom:4px;left:8px;width:130px;height:30px;border:6px solid #252525;border-radius:20px;background:repeating-linear-gradient(90deg,#111 0 10px,#303030 10px 13px)}
-.body{position:absolute;left:28px;bottom:34px;width:92px;height:50px;background:#f20a0a;border-radius:14px 18px 5px 5px;box-shadow:0 7px 0 #b50000}
-.cab{position:absolute;left:77px;bottom:67px;width:50px;height:45px;background:#151515;border:4px solid #f20a0a;border-radius:8px 12px 2px 2px;transform:skewX(-8deg)}
-.window{position:absolute;inset:6px;background:linear-gradient(135deg,#292929,#070707);border:1px solid #555}
-.boom{position:absolute;left:112px;bottom:82px;width:84px;height:13px;background:#f20a0a;border-radius:10px;transform-origin:7px 7px;transform:rotate(-24deg);animation:boom 3s ease-in-out infinite}
-.stick{position:absolute;left:176px;bottom:117px;width:65px;height:11px;background:#f20a0a;border-radius:10px;transform-origin:5px 5px;transform:rotate(43deg);animation:stick 3s ease-in-out infinite}
-.bucket{position:absolute;left:222px;bottom:76px;width:34px;height:31px;border:8px solid #f20a0a;border-top:0;border-radius:2px 2px 12px 12px;transform:rotate(26deg);transform-origin:5px 5px;animation:bucket 3s ease-in-out infinite}
-@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-2px)}}
-@keyframes drive{0%{left:-240px}15%,85%{left:calc(50% - 118px)}100%{left:calc(100% + 20px)}}
-@keyframes boom{0%,100%{transform:rotate(-24deg)}50%{transform:rotate(-7deg)}}
-@keyframes stick{0%,100%{transform:rotate(43deg)}50%{transform:rotate(22deg)}}
-@keyframes bucket{0%,100%{transform:rotate(26deg)}50%{transform:rotate(4deg)}}
-@media(max-width:600px){.page{padding-bottom:105px}.logo{width:min(24vw,100px)}.scene{height:120px}.exc{transform:scale(.78);transform-origin:bottom center}}
+  :root{
+    --ink:#0b0b0c;
+    --panel:#18181b;
+    --panel-line:#2c2c30;
+    --red:#e2231a;
+    --red-dark:#9c130c;
+    --white:#f7f5f2;
+    --muted:#a3a2a4;
+    --wa-green:#25D366;
+    --wolt-blue:#00c2e8;
+    --glovo-yellow:#ffc244;
+    --radius-lg:18px;
+    --radius-sm:8px;
+    --pad:clamp(48px,8vw,96px);
+    --maxw:1080px;
+  }
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+  html{scroll-behavior:smooth;scroll-padding-top:76px;}
+  body{
+    background:var(--ink);
+    color:var(--white);
+    font-family:'Inter',sans-serif;
+    line-height:1.55;
+    -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+  }
+  img{max-width:100%;display:block;}
+  a{color:inherit;text-decoration:none;}
+  ul{list-style:none;}
+  h1,h2,h3{font-family:'Anton',sans-serif;font-weight:400;letter-spacing:.03em;line-height:1.05;}
+  .container{width:100%;max-width:var(--maxw);margin:0 auto;padding:0 clamp(18px,4vw,32px);}
+  .section-pad{padding:var(--pad) 0;}
+  .eyebrow{font-family:'Anton',sans-serif;font-size:.8rem;letter-spacing:.14em;color:var(--red);margin-bottom:8px;}
+  .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;}
+  :focus-visible{outline:3px solid var(--red);outline-offset:3px;}
+  @media (prefers-reduced-motion:reduce){*{animation-duration:0.001ms !important;transition-duration:0.001ms !important;}}
+
+  h2.section-title{font-size:clamp(2rem,6vw,2.9rem);text-transform:uppercase;}
+  p.section-sub{color:var(--muted);max-width:520px;margin-top:10px;font-size:1rem;}
+
+  /* ===== NAVBAR ===== */
+  .navbar{
+    position:fixed;top:0;left:0;right:0;z-index:1000;height:70px;
+    display:flex;align-items:center;
+    background:rgba(10,10,11,0);
+    transition:background .3s, box-shadow .3s;
+  }
+  .navbar.scrolled{background:rgba(10,10,11,.92);backdrop-filter:blur(10px);box-shadow:0 2px 20px rgba(0,0,0,.4);}
+  .navbar .container{display:flex;align-items:center;justify-content:space-between;}
+  .nav-brand{display:flex;align-items:center;gap:10px;}
+  .nav-brand .mark{width:34px;height:34px;flex-shrink:0;}
+  .nav-brand span{font-family:'Anton',sans-serif;font-size:1.05rem;letter-spacing:.04em;text-transform:uppercase;}
+  .nav-brand span em{font-style:normal;color:var(--red);}
+  .nav-links{display:flex;gap:6px;}
+  .nav-links a{
+    font-size:.82rem;font-weight:600;text-transform:uppercase;letter-spacing:.05em;
+    padding:8px 14px;border-radius:6px;color:rgba(247,245,242,.8);
+    transition:background .2s,color .2s;
+  }
+  .nav-links a:hover{background:rgba(226,35,26,.18);color:var(--white);}
+  .hamburger{display:none;flex-direction:column;gap:5px;background:none;border:0;cursor:pointer;padding:8px;z-index:1001;}
+  .hamburger span{width:24px;height:2.5px;background:var(--white);border-radius:2px;transition:transform .25s,opacity .25s;}
+  .hamburger.open span:nth-child(1){transform:translateY(7.5px) rotate(45deg);}
+  .hamburger.open span:nth-child(2){opacity:0;}
+  .hamburger.open span:nth-child(3){transform:translateY(-7.5px) rotate(-45deg);}
+  @media (max-width:820px){
+    .hamburger{display:flex;}
+    .nav-links{
+      position:fixed;inset:0;background:rgba(8,8,9,.98);
+      flex-direction:column;align-items:center;justify-content:center;gap:6px;
+      opacity:0;transform:translateY(-12px);pointer-events:none;
+      transition:opacity .3s,transform .3s;
+    }
+    .nav-links.open{opacity:1;transform:translateY(0);pointer-events:all;}
+    .nav-links a{font-size:1.3rem;padding:14px 24px;}
+  }
+
+  /* ===== K1 HERO ===== */
+  .hero{
+    position:relative;min-height:100svh;display:flex;align-items:center;justify-content:center;
+    overflow:hidden;background:var(--ink);text-align:center;padding-top:70px;
+  }
+  .hero-illustration{position:absolute;inset:0;width:100%;height:100%;z-index:0;}
+  .hero-illustration img{width:100%;height:100%;object-fit:cover;display:block;}
+  .hero-scrim{
+    position:absolute;inset:0;z-index:1;
+    background:
+      radial-gradient(ellipse at 50% 30%, rgba(11,11,12,.35) 0%, rgba(11,11,12,.75) 55%, rgba(11,11,12,.96) 100%);
+  }
+  .hero-content{position:relative;z-index:2;padding:0 22px;max-width:720px;}
+  .logo-badge{width:clamp(184px,22vw,116px);height:auto;margin:0 auto 22px;
+    opacity:0;transform:scale(.85);animation:fadeUp .7s .15s cubic-bezier(.22,1,.36,1) forwards;}
+  .hero-title{
+    font-size:clamp(2.6rem,9vw,4.6rem);text-transform:uppercase;
+    text-shadow:0 4px 18px rgba(0,0,0,.6);
+    opacity:0;transform:translateY(24px);animation:fadeUp .7s .35s cubic-bezier(.22,1,.36,1) forwards;
+  }
+  .hero-title .magic{
+    display:block;font-family:'Permanent Marker',cursive;color:var(--red);
+    font-size:clamp(2.4rem,10vw,4.8rem);line-height:1;transform:rotate(-3deg);
+    text-shadow:0 3px 0 rgba(0,0,0,.5);
+  }
+  .hero-title .rest{color:var(--white);-webkit-text-stroke:1px rgba(0,0,0,.4);}
+  .hero-tagline{
+    margin-top:14px;font-size:clamp(1rem,2.6vw,1.25rem);color:var(--muted);
+    letter-spacing:.03em;
+    opacity:0;transform:translateY(18px);animation:fadeUp .7s .55s cubic-bezier(.22,1,.36,1) forwards;
+  }
+  .hero-cta{
+    display:inline-block;margin-top:32px;padding:16px 44px;
+    background:var(--red);color:var(--white);font-family:'Anton',sans-serif;
+    font-size:1.15rem;letter-spacing:.08em;text-transform:uppercase;border-radius:6px;
+    box-shadow:0 10px 30px rgba(226,35,26,.35);
+    transition:background .25s,transform .2s,box-shadow .25s;
+    opacity:0;transform:translateY(18px);animation:fadeUp .7s .75s cubic-bezier(.22,1,.36,1) forwards;
+  }
+  .hero-cta:hover{background:var(--red-dark);transform:translateY(-3px);box-shadow:0 14px 36px rgba(226,35,26,.5);}
+  @keyframes fadeUp{to{opacity:1;transform:translateY(0) scale(1);}}
+
+  /* ===== K2 MENU ===== */
+  .menu-section{background:var(--ink);}
+  .menu-frame{
+    border:3px solid var(--red);border-radius:var(--radius-sm);overflow:hidden;
+    box-shadow:0 20px 60px rgba(0,0,0,.55);
+    max-width:520px;margin:0 auto;
+  }
+  .menu-frame img{width:100%;height:auto;display:block;}
+
+  /* ===== K5 GALLERY ===== */
+  .gallery-section{background:var(--panel);border-top:1px solid var(--panel-line);border-bottom:1px solid var(--panel-line);}
+  .gallery-groups{display:grid;grid-template-columns:1fr;gap:44px;margin-top:36px;}
+  @media (min-width:860px){.gallery-groups{grid-template-columns:1fr 1fr;}}
+  .gallery-block h3{font-size:1.3rem;text-transform:uppercase;color:var(--red);margin-bottom:14px;letter-spacing:.04em;}
+  .gallery-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+  .gallery-grid .g-img{
+    position:relative;
+    aspect-ratio:1/1;border-radius:6px;overflow:hidden;background:var(--ink);
+    border:1.5px solid var(--red);
+  }
+  .gallery-grid .g-img img{width:100%;height:100%;object-fit:cover;transition:transform .4s;}
+  .gallery-grid .g-img:hover img{transform:scale(1.06);}
+  /* Per-image description, bottom of each tile: transparent + blurred (frosted glass) */
+  .g-img .g-caption{
+    position:absolute;left:0;right:0;bottom:0;
+    background:rgba(11,11,12,.42);
+    backdrop-filter:blur(7px);-webkit-backdrop-filter:blur(7px);
+    color:var(--white);font-size:.72rem;line-height:1.3;
+    padding:7px 9px;text-align:center;pointer-events:none;
+  }
+  .g-img.is-empty{visibility:hidden;}
+  .gallery-caption{margin-top:14px;color:var(--muted);font-size:.95rem;max-width:46ch;}
+
+  .gallery-nav{display:flex;align-items:center;justify-content:center;gap:12px;margin-top:16px;}
+  .g-nav-btn{
+    width:34px;height:34px;border-radius:50%;flex-shrink:0;
+    border:1px solid var(--panel-line);background:var(--ink);color:var(--white);
+    font-size:1.2rem;line-height:1;display:flex;align-items:center;justify-content:center;
+    cursor:pointer;transition:background .2s,border-color .2s;
+  }
+  .g-nav-btn:hover{background:var(--red);border-color:var(--red);}
+  .g-dots{display:flex;gap:6px;}
+  .g-dot{width:7px;height:7px;padding:0;border-radius:50%;border:0;background:var(--panel-line);cursor:pointer;}
+  .g-dot.active{background:var(--red);}
+  .g-count{font-size:.78rem;color:var(--muted);min-width:32px;text-align:center;}
+
+  /* ===== K6 ORDER NOW ===== */
+  .order-section{background:var(--ink);}
+  .order-section .container{text-align:center;}
+  .order-sub{margin:10px auto 0;}
+
+  .wa-diagram{position:relative;width:min(92vw,400px);aspect-ratio:1/1;margin:48px auto 0;}
+  .wa-center{
+    position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+    width:clamp(78px,20vw,116px);height:clamp(78px,20vw,116px);border-radius:50%;
+    background:var(--wa-green);display:flex;align-items:center;justify-content:center;
+    box-shadow:0 0 0 8px rgba(37,211,102,.15),0 14px 34px rgba(0,0,0,.55);
+    transition:transform .2s;
+  }
+  .wa-center:hover{transform:translate(-50%,-50%) scale(1.06);}
+  .wa-center svg{width:56%;height:56%;}
+  .wa-arrow{position:absolute;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:6px;}
+  .wa-arrow .arrow-icon{width:clamp(20px,5.5vw,30px);display:block;}
+  .wa-label{
+    background:var(--panel);border:1.5px solid var(--red);color:var(--white);
+    font-family:'Anton',sans-serif;font-size:.62rem;letter-spacing:.05em;text-transform:uppercase;
+    padding:5px 9px;border-radius:20px;white-space:nowrap;
+  }
+  .wa-note{margin-top:22px;color:var(--muted);font-size:.85rem;}
+
+  .order-row{display:flex;justify-content:center;gap:16px;flex-wrap:wrap;margin-top:46px;}
+  .order-btn{
+    display:inline-flex;align-items:center;gap:10px;padding:14px 26px;border-radius:10px;
+    font-family:'Anton',sans-serif;font-size:1.05rem;letter-spacing:.04em;text-transform:uppercase;
+    transition:transform .2s,box-shadow .2s;box-shadow:0 8px 22px rgba(0,0,0,.35);
+  }
+  .order-btn:hover{transform:translateY(-3px);}
+  .order-btn.wolt{background:var(--wolt-blue);color:#04222a;}
+  .order-btn.glovo{background:var(--glovo-yellow);color:#241a00;}
+  .order-btn svg{width:22px;height:22px;flex-shrink:0;}
+
+  .social-row{display:flex;justify-content:center;gap:18px;margin-top:38px;}
+  .social-icon{
+    width:52px;height:52px;border-radius:50%;background:var(--panel);border:1px solid var(--panel-line);
+    display:flex;align-items:center;justify-content:center;transition:transform .2s,background .2s;
+  }
+  .social-icon:hover{transform:translateY(-3px);background:#222226;}
+  .social-icon svg{width:24px;height:24px;}
+
+  /* ===== K3 / K4 GRID ===== */
+  .find-section{background:var(--panel);border-top:1px solid var(--panel-line);}
+  .find-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:32px;}
+  .find-box{
+    border-radius:var(--radius-sm);overflow:hidden;border:1px solid var(--panel-line);
+    background:var(--ink);aspect-ratio:1/1;position:relative;
+  }
+  .find-box iframe{width:100%;height:100%;border:0;filter:grayscale(.25) contrast(1.05);}
+  .find-box img{width:100%;height:100%;object-fit:cover;}
+  .find-caption{margin-top:10px;font-size:.82rem;color:var(--muted);text-align:center;}
+  .find-caption a{color:var(--red);font-weight:600;}
+  @media (max-width:520px){
+    .find-grid{gap:10px;}
+  }
+
+  /* ===== FOOTER ===== */
+  .site-footer{background:#000;padding:40px 0 22px;text-align:center;}
+  .site-footer p{color:var(--muted);font-size:.85rem;}
+  .site-footer .foot-brand{font-family:'Anton',sans-serif;letter-spacing:.05em;color:var(--white);font-size:1rem;margin-bottom:8px;text-transform:uppercase;}
+  .site-footer a{color:var(--red);font-weight:600;}
 </style>
 </head>
 <body>
-<main class="page">
-<div class="logo">
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
-  
-  
-  <circle cx="512" cy="512" r="512" fill="#000000"/>
-  <path d="M 661.84,103.77 L 641.19,106.13 L 572.76,257.15 L 445.34,222.94 L 420.56,225.88 L 410.53,247.71 L 393.42,242.99 L 380.45,254.79 L 320.86,426.46 L 332.07,457.73 L 311.42,477.19 L 291.96,589.87 L 298.45,622.91 L 317.32,650.63 L 422.92,732.04 L 402.27,730.27 L 310.83,684.26 L 295.50,689.57 L 305.53,713.76 L 373.96,787.50 L 360.39,788.09 L 301.40,753.87 L 286.65,761.54 L 310.24,798.12 L 351.54,825.84 L 321.45,899.58 L 330.89,920.82 L 356.85,910.79 L 386.35,844.72 L 425.87,869.50 L 458.91,854.75 L 562.73,717.29 L 555.06,699.01 L 503.74,681.31 L 463.04,651.81 L 585.74,674.82 L 614.06,649.45 L 640.01,604.03 L 642.96,588.10 L 635.29,577.48 L 561.55,553.29 L 506.10,515.54 L 641.78,551.53 L 662.43,546.81 L 684.85,519.67 L 688.39,480.14 L 596.95,443.57 L 554.47,414.07 L 699.60,447.70 L 719.06,441.21 L 731.45,424.10 L 736.76,392.24 L 719.06,357.44 L 609.93,271.90 L 666.56,125.01 Z M 349.77,478.37 L 350.95,477.19 L 352.13,478.37 L 355.67,479.55 L 373.37,490.76 L 389.29,503.74 L 396.37,510.82 L 402.27,514.95 L 403.45,514.95 L 406.40,517.90 L 411.12,520.85 L 417.02,523.21 L 420.56,526.75 L 425.87,530.29 L 427.05,532.06 L 434.72,537.37 L 437.67,540.91 L 439.44,541.50 L 444.75,546.81 L 442.98,548.58 L 439.44,548.58 L 432.95,545.04 L 427.64,543.27 L 423.51,540.32 L 421.74,540.32 L 418.20,537.96 L 417.02,537.96 L 414.07,535.60 L 409.35,533.83 L 405.81,530.88 L 402.27,529.70 L 391.65,520.85 L 386.35,518.49 L 379.27,513.18 L 376.32,512.00 L 372.78,508.46 L 364.52,503.15 L 356.85,494.89 L 355.67,491.94 L 350.36,484.86 L 349.18,481.32 Z M 463.63,294.91 L 465.40,293.73 L 473.65,296.09 L 484.27,303.76 L 487.22,304.94 L 490.76,308.47 L 502.56,316.73 L 513.18,322.04 L 517.90,323.22 L 520.26,325.58 L 528.52,330.30 L 532.06,333.25 L 552.71,343.28 L 572.76,355.67 L 579.25,356.85 L 590.46,361.57 L 593.41,365.11 L 597.54,366.88 L 601.08,370.42 L 603.44,370.42 L 606.39,373.37 L 604.62,373.96 L 595.77,372.78 L 579.84,368.06 L 577.48,368.06 L 574.53,365.70 L 568.04,363.34 L 565.68,360.98 L 560.96,359.80 L 555.65,356.85 L 550.35,355.67 L 546.22,352.72 L 524.98,342.69 L 514.36,334.43 L 503.15,328.53 L 492.53,320.86 L 490.17,320.27 L 487.22,317.32 L 481.91,314.96 L 478.37,311.42 L 477.19,311.42 L 464.22,297.86 Z" fill="#F20A0A" fill-rule="evenodd"/>
-</svg>
-</div>
-<h1>Stranica je <span>u izradi</span></h1>
-<p class="sub">Vidimo se uskoro.</p>
-<div class="line"></div>
-</main>
-<div class="scene" aria-hidden="true">
-<div class="exc"><div class="track"></div><div class="body"></div><div class="cab"><div class="window"></div></div><div class="boom"></div><div class="stick"></div><div class="bucket"></div></div>
-<div class="ground"></div>
-</div>
+
+<nav class="navbar" id="navbar">
+  <div class="container">
+    <a href="#hero" class="nav-brand">
+      <img class="mark" data-img="LOGO" alt="Magic Kebab - grb">
+      <span>Magic <em>Kebab</em></span>
+    </a>
+    <div class="nav-links" id="navLinks">
+      <a href="#meni">Jelovnik</a>
+      <a href="#galerija">Galerija</a>
+      <a href="#naruci">Naruči</a>
+      <a href="#lokacija">Lokacija</a>
+    </div>
+    <button class="hamburger" id="hamburger" aria-label="Otvori izbornik">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+
+<!-- ================= K1 : HERO ================= -->
+<section class="hero" id="hero">
+  <div class="hero-illustration" aria-hidden="true">
+    <img data-img="K1_HERO_BG" alt="">
+  </div>
+  <div class="hero-scrim"></div>
+  <div class="hero-content">
+    <img class="logo-badge" data-img="LOGO" alt="Magic Kebab - grb">
+    <h1 class="hero-title">
+      <span class="magic">Magic</span>
+      <span class="rest">Kebab &amp; Burger</span>
+    </h1>
+    <p class="hero-tagline">Najbolji okusi u Sesvetama</p>
+    <a href="#naruci" class="hero-cta">Naruči odmah</a>
+  </div>
+</section>
+
+<!-- ================= K2 : MENU ================= -->
+<section class="menu-section section-pad" id="meni">
+  <h2 class="sr-only">Meni</h2>
+  <div class="container">
+    <div class="menu-frame">
+      <img data-img="K2_MENU" alt="Cjelokupni meni restorana Magic Kebab i Burger - kebabi, pljeskavice, hamburgeri, dodaci i piće s cijenama">
+    </div>
+  </div>
+</section>
+
+<!-- ================= K5 : GALERIJA ================= -->
+<section class="gallery-section section-pad" id="galerija">
+  <div class="container">
+    <p class="eyebrow">Fotografije</p>
+    <h2 class="section-title">Galerija</h2>
+    <p class="section-sub">Pogled na ono što vas čeka na tanjuru.</p>
+    <div class="gallery-groups">
+      <div class="gallery-block">
+        <h3>Kebabi</h3>
+        <div class="gallery-grid" id="gallery-kebab">
+          <div class="g-img"><img alt="Kebab fotografija"><span class="g-caption"></span></div>
+          <div class="g-img"><img alt="Kebab fotografija"><span class="g-caption"></span></div>
+          <div class="g-img"><img alt="Kebab fotografija"><span class="g-caption"></span></div>
+          <div class="g-img"><img alt="Kebab fotografija"><span class="g-caption"></span></div>
+        </div>
+        <div class="gallery-nav" data-gallery-nav="kebab">
+          <button type="button" class="g-nav-btn" data-dir="-1" aria-label="Prethodne fotografije">&#8249;</button>
+          <div class="g-dots"></div>
+          <span class="g-count"></span>
+          <button type="button" class="g-nav-btn" data-dir="1" aria-label="Sljedeće fotografije">&#8250;</button>
+        </div>
+        <p class="gallery-caption">Sočno meso, svježe povrće i domaći umaci u svakom zalogaju našeg kebaba - pripremljeno svaki dan iznova.</p>
+      </div>
+      <div class="gallery-block">
+        <h3>Burgeri</h3>
+        <div class="gallery-grid" id="gallery-burger">
+          <div class="g-img"><img alt="Burger fotografija"><span class="g-caption"></span></div>
+          <div class="g-img"><img alt="Burger fotografija"><span class="g-caption"></span></div>
+          <div class="g-img"><img alt="Burger fotografija"><span class="g-caption"></span></div>
+          <div class="g-img"><img alt="Burger fotografija"><span class="g-caption"></span></div>
+        </div>
+        <div class="gallery-nav" data-gallery-nav="burger">
+          <button type="button" class="g-nav-btn" data-dir="-1" aria-label="Prethodne fotografije">&#8249;</button>
+          <div class="g-dots"></div>
+          <span class="g-count"></span>
+          <button type="button" class="g-nav-btn" data-dir="1" aria-label="Sljedeće fotografije">&#8250;</button>
+        </div>
+        <p class="gallery-caption">Sočni burgeri od kvalitetnog mesa, hrskave slanine i domaćih umaka, servirani u mekanoj lepinji.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= K6 : NARUČI SADA ================= -->
+<section class="order-section section-pad" id="naruci">
+  <div class="container">
+    <p class="eyebrow">Dostava i naručivanje</p>
+    <h2 class="section-title">Naruči sada</h2>
+    <p class="section-sub order-sub" style="margin-left:auto;margin-right:auto;">Najbrže do tvog kebaba - piši nam direktno na WhatsApp.</p>
+
+    <div class="wa-diagram">
+      <a class="wa-center" href="https://wa.me/385918824850?text=Hej%21%20naru%C4%8Dio%20bih%20kebab%21" target="_blank" rel="noopener" aria-label="Naruči preko WhatsAppa">
+        <svg viewBox="0 0 32 32" aria-hidden="true">
+          <path fill="#fff" d="M23.5 8.5c-2-2-4.7-3.1-7.5-3.1-5.8 0-10.6 4.7-10.6 10.6 0 1.9.5 3.7 1.4 5.3L5 27l5.8-1.7c1.5.8 3.2 1.3 5 1.3h0c5.8 0 10.6-4.7 10.6-10.6 0-2.8-1.1-5.5-3-7.5zm-7.5 16.3h0c-1.6 0-3.1-.4-4.5-1.2l-.3-.2-3.4 1 1-3.3-.2-.3c-.9-1.4-1.3-3-1.3-4.7 0-4.8 3.9-8.7 8.7-8.7 2.3 0 4.5.9 6.1 2.6 1.6 1.6 2.6 3.8 2.5 6.1 0 4.8-3.9 8.7-8.6 8.7zm4.8-6.5c-.3-.1-1.5-.8-1.8-.9-.2-.1-.4-.1-.6.1-.2.3-.6.9-.8 1-.1.2-.3.2-.5.1-.3-.1-1.1-.4-2.1-1.3-.8-.7-1.3-1.6-1.4-1.8-.2-.3 0-.4.1-.6l.4-.5c.1-.1.2-.3.2-.4.1-.2 0-.3 0-.5-.1-.1-.6-1.5-.8-2-.2-.5-.4-.5-.6-.5h-.5c-.2 0-.5.1-.7.3-.2.3-.9.9-.9 2.2s1 2.6 1.1 2.7c.1.2 1.9 3 4.7 4.1.7.3 1.2.5 1.6.6.7.2 1.3.2 1.8.1.5-.1 1.5-.6 1.8-1.2.2-.6.2-1.1.1-1.2 0-.2-.2-.2-.5-.4z"/>
+        </svg>
+      </a>
+
+      <div class="wa-arrow" style="top:31%;left:17.1%;">
+        <span class="wa-label">10% popusta</span>
+        <svg class="arrow-icon" viewBox="0 0 24 40" style="transform:rotate(120deg);" aria-hidden="true">
+          <line x1="12" y1="38" x2="12" y2="10" stroke="#e2231a" stroke-width="4" stroke-linecap="round"/>
+          <polygon points="12,0 22,16 2,16" fill="#e2231a"/>
+        </svg>
+      </div>
+
+      <div class="wa-arrow" style="top:31%;left:82.9%;">
+        <span class="wa-label">najbolja opcija</span>
+        <svg class="arrow-icon" viewBox="0 0 24 40" style="transform:rotate(240deg);" aria-hidden="true">
+          <line x1="12" y1="38" x2="12" y2="10" stroke="#e2231a" stroke-width="4" stroke-linecap="round"/>
+          <polygon points="12,0 22,16 2,16" fill="#e2231a"/>
+        </svg>
+      </div>
+
+      <div class="wa-arrow" style="top:12%;left:50%;">
+        <svg class="arrow-icon" viewBox="0 0 24 40" style="transform:rotate(180deg);" aria-hidden="true">
+          <line x1="12" y1="38" x2="12" y2="10" stroke="#f7f5f2" stroke-width="4" stroke-linecap="round"/>
+          <polygon points="12,0 22,16 2,16" fill="#f7f5f2"/>
+        </svg>
+      </div>
+
+      <div class="wa-arrow" style="top:88%;left:50%;">
+        <svg class="arrow-icon" viewBox="0 0 24 40" style="transform:rotate(0deg);" aria-hidden="true">
+          <line x1="12" y1="38" x2="12" y2="10" stroke="#f7f5f2" stroke-width="4" stroke-linecap="round"/>
+          <polygon points="12,0 22,16 2,16" fill="#f7f5f2"/>
+        </svg>
+      </div>
+
+      <div class="wa-arrow" style="top:69%;left:17.1%;">
+        <svg class="arrow-icon" viewBox="0 0 24 40" style="transform:rotate(60deg);" aria-hidden="true">
+          <line x1="12" y1="38" x2="12" y2="10" stroke="#f7f5f2" stroke-width="4" stroke-linecap="round"/>
+          <polygon points="12,0 22,16 2,16" fill="#f7f5f2"/>
+        </svg>
+      </div>
+
+      <div class="wa-arrow" style="top:69%;left:82.9%;">
+        <svg class="arrow-icon" viewBox="0 0 24 40" style="transform:rotate(300deg);" aria-hidden="true">
+          <line x1="12" y1="38" x2="12" y2="10" stroke="#f7f5f2" stroke-width="4" stroke-linecap="round"/>
+          <polygon points="12,0 22,16 2,16" fill="#f7f5f2"/>
+        </svg>
+      </div>
+    </div>
+    <p class="wa-note">Klikni na WhatsApp ikonu za trenutnu narudžbu</p>
+
+    <div class="order-row">
+      <!-- UPUTE: zamijenite href="#" pravim linkom na Wolt stranicu trgovine -->
+      <a class="order-btn wolt" href="#" target="_blank" rel="noopener" aria-label="Naruči preko Wolt aplikacije">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#04222a" stroke-width="2"><path d="M4 10 L12 4 L20 10 L20 20 L4 20 Z"/><path d="M9 20 V13 H15 V20"/></svg>
+        Wolt
+      </a>
+      <!-- UPUTE: zamijenite href="#" pravim linkom na Glovo stranicu trgovine -->
+      <a class="order-btn glovo" href="#" target="_blank" rel="noopener" aria-label="Naruči preko Glovo aplikacije">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#241a00" stroke-width="2"><circle cx="6" cy="19" r="2"/><circle cx="17" cy="19" r="2"/><path d="M2 4h2l2.4 12.2a1 1 0 0 0 1 .8h9.2a1 1 0 0 0 1-.8L20 8H6"/></svg>
+        Glovo
+      </a>
+    </div>
+
+    <div class="social-row">
+      <!-- UPUTE: zamijenite href="#" pravim linkom na Facebook stranicu -->
+      <a class="social-icon" href="https://www.facebook.com/profile.php?id=61595091257634" target="_blank" rel="noopener" aria-label="Facebook">
+        <svg viewBox="0 0 24 24" fill="#1877F2"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+      </a>
+      <!-- UPUTE: zamijenite href="#" pravim linkom na Instagram profil -->
+      <a class="social-icon" href="https://www.instagram.com/magic.kebabiburger/" target="_blank" rel="noopener" aria-label="Instagram">
+        <svg viewBox="0 0 24 24" fill="#e2231a"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
+      </a>
+      <!-- UPUTE: zamijenite href="#" pravim linkom na TikTok profil -->
+      <a class="social-icon" href="https://www.tiktok.com/@magic.kebabiburger" target="_blank" rel="noopener" aria-label="TikTok">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <g transform="translate(-1,-1)"><rect x="11" y="4" width="2.4" height="12" rx="1.2" fill="#25F4EE"/><circle cx="8.3" cy="17" r="3.6" fill="#25F4EE"/></g>
+          <g transform="translate(1,1)"><rect x="11" y="4" width="2.4" height="12" rx="1.2" fill="#FE2C55"/><circle cx="8.3" cy="17" r="3.6" fill="#FE2C55"/></g>
+          <g><rect x="11" y="4" width="2.4" height="12" rx="1.2" fill="#f7f5f2"/><circle cx="8.3" cy="17" r="3.6" fill="#f7f5f2"/><path d="M13.4 4c0 2.3 1.9 4.2 4.2 4.2" stroke="#f7f5f2" stroke-width="2.3" fill="none" stroke-linecap="round"/></g>
+        </svg>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ================= K3 + K4 : LOKACIJA I OBJEKT ================= -->
+<section class="find-section section-pad" id="lokacija">
+  <div class="container">
+    <p class="eyebrow">Posjeti nas</p>
+    <h2 class="section-title">Lokacija</h2>
+    <p class="section-sub">Pronađi nas na Google karti ili navrati osobno u Sesvete.</p>
+    <div class="find-grid">
+      <div>
+        <div class="find-box">
+          <iframe src="https://www.google.com/maps?q=45.8263102,16.1109221&z=17&output=embed" title="Lokacija Magic Kebab Sesvete na Google karti" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+        </div>
+        <p class="find-caption"><a href="https://maps.app.goo.gl/VRdnMab3H7yC4E2e6" target="_blank" rel="noopener">Otvori u Google kartama</a></p>
+      </div>
+      <div>
+        <!-- UPUTE: zamijenite src stvarnom fotografijom vanjštine/interijera objekta -->
+        <div class="find-box">
+          <img data-img="K4_STORE" alt="Objekt Magic Kebab i Burger u Sesvetama">
+        </div>
+        <p class="find-caption">Naš objekt u Sesvetama</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="site-footer">
+  <div class="container">
+    <p class="foot-brand">Magic Kebab &amp; Burger</p>
+    <p>Sesvete, Zagreb &bull; <a href="tel:+385918824850">+385 91 882 4850</a></p>
+    <p style="margin-top:14px;">&copy; 2026 Magic Kebab i Burger. Sva prava pridržana.</p>
+  </div>
+</footer>
+
+<script>
+  // Navbar background on scroll + mobile menu
+  const navbar = document.getElementById('navbar');
+  const hamburger = document.getElementById('hamburger');
+  const navLinks = document.getElementById('navLinks');
+
+  window.addEventListener('scroll', () => {
+    navbar.classList.toggle('scrolled', window.scrollY > 40);
+  }, { passive: true });
+
+  hamburger.addEventListener('click', () => {
+    hamburger.classList.toggle('open');
+    navLinks.classList.toggle('open');
+  });
+  navLinks.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
+    hamburger.classList.remove('open');
+    navLinks.classList.remove('open');
+  }));
+
+  // Fill every static image on the page (logo, menu, store photo) from the
+  // local IMAGES variables defined at the top of this file.
+  document.querySelectorAll('[data-img]').forEach(img => {
+    const key = img.dataset.img;
+    if (IMAGES[key]) {
+      img.src = IMAGES[key];
+      img.loading = 'lazy';
+    } else {
+      console.warn('Nema definirane IMAGES varijable za:', key);
+    }
+  });
+
+  // ---- K5 gallery: shuffle the pool + show 4 photos per slide ----
+  // Order is re-shuffled every time the page loads. If a pool has more
+  // than 4 photos, the rest appear on the next slide (prev/next + dots).
+  function shuffle(arr) {
+    const a = arr.slice();
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
+  function chunkFour(arr) {
+    const pages = [];
+    for (let i = 0; i < arr.length; i += 4) pages.push(arr.slice(i, i + 4));
+    return pages.length ? pages : [[]];
+  }
+
+  function initGallery(name) {
+    const grid = document.getElementById('gallery-' + name);
+    const nav = document.querySelector('.gallery-nav[data-gallery-nav="' + name + '"]');
+    const pool = GALLERY_POOLS[name];
+    if (!grid || !nav || !pool) return;
+
+    const slots = grid.querySelectorAll('.g-img');
+    const pages = chunkFour(shuffle(pool));
+    let current = 0;
+
+    const dotsWrap = nav.querySelector('.g-dots');
+    const countEl = nav.querySelector('.g-count');
+
+    function render() {
+      const page = pages[current] || [];
+      slots.forEach((slot, i) => {
+        const img = slot.querySelector('img');
+        const caption = slot.querySelector('.g-caption');
+        const key = page[i];
+        if (key) {
+          img.src = IMAGES[key];
+          img.loading = 'lazy';
+          if (caption) caption.textContent = K5_CAPTIONS[key] || '';
+          slot.classList.remove('is-empty');
+        } else {
+          img.removeAttribute('src');
+          if (caption) caption.textContent = '';
+          slot.classList.add('is-empty');
+        }
+      });
+      dotsWrap.querySelectorAll('.g-dot').forEach((d, i) => d.classList.toggle('active', i === current));
+      countEl.textContent = (current + 1) + ' / ' + pages.length;
+    }
+
+    if (pages.length <= 1) {
+      nav.style.display = 'none';
+    } else {
+      dotsWrap.innerHTML = pages.map((_, i) =>
+        '<button type="button" class="g-dot" aria-label="Slide ' + (i + 1) + '"></button>'
+      ).join('');
+      dotsWrap.querySelectorAll('.g-dot').forEach((d, i) => {
+        d.addEventListener('click', () => { current = i; render(); });
+      });
+      nav.querySelector('[data-dir="-1"]').addEventListener('click', () => {
+        current = (current - 1 + pages.length) % pages.length; render();
+      });
+      nav.querySelector('[data-dir="1"]').addEventListener('click', () => {
+        current = (current + 1) % pages.length; render();
+      });
+    }
+    render();
+  }
+
+  initGallery('kebab');
+  initGallery('burger');
+</script>
 </body>
 </html>
