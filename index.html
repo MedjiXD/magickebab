@@ -187,6 +187,27 @@
   .hero-cta:hover{background:var(--red-dark);transform:translateY(-3px);box-shadow:0 14px 36px rgba(226,35,26,.5);}
   @keyframes fadeUp{to{opacity:1;transform:translateY(0) scale(1);}}
 
+  /* K1 HERO - mobilna verzija: smanjeno tako da cijeli hero stane na jedan ekran.
+     Veličine se računaju prema širini (vw) i visini (svh) ekrana. */
+  @media (max-width:600px){
+    .hero{height:100vh;height:100svh;min-height:0;padding-top:70px;padding-bottom:20px;}
+    .hero-content{padding:0 16px;}
+    .logo-badge{width:min(34vw,20svh);margin-bottom:14px;}
+    .hero-title{font-size:clamp(2rem,9vw,2.8rem);}
+    .hero-title .magic{font-size:clamp(2.2rem,11vw,3rem);}
+    .hero-tagline{margin-top:8px;font-size:.95rem;}
+    .hero-cta{margin-top:22px;padding:13px 34px;font-size:1rem;}
+  }
+  /* mobitel u landscape položaju / vrlo niski ekrani */
+  @media (max-height:520px) and (max-width:950px){
+    .hero{height:100vh;height:100svh;min-height:0;padding-top:58px;padding-bottom:10px;}
+    .logo-badge{width:18svh;margin-bottom:6px;}
+    .hero-title{font-size:8svh;}
+    .hero-title .magic{font-size:9.5svh;}
+    .hero-tagline{margin-top:4px;font-size:.85rem;}
+    .hero-cta{margin-top:10px;padding:9px 28px;font-size:.9rem;}
+  }
+
   /* ===== K2 MENU ===== */
   .menu-section{background:var(--ink);}
   .menu-frame{
@@ -232,6 +253,23 @@
   .g-dot{width:7px;height:7px;padding:0;border-radius:50%;border:0;background:var(--panel-line);cursor:pointer;}
   .g-dot.active{background:var(--red);}
   .g-count{font-size:.78rem;color:var(--muted);min-width:32px;text-align:center;}
+
+  /* K5 - klik na sliku: povećanje u sredinu ekrana (ponovni klik vraća natrag) */
+  .gallery-grid .g-img img{cursor:zoom-in;}
+  .gallery-grid .g-img img.is-zoomed{
+    position:fixed !important;top:50% !important;left:50% !important;
+    transform:translate(-50%,-50%) !important;
+    width:min(90vw,560px) !important;height:min(90vw,560px) !important;
+    max-width:none;z-index:2000;border-radius:10px;
+    box-shadow:0 24px 70px rgba(0,0,0,.65);
+    cursor:zoom-out;transition:none;
+  }
+  .gallery-zoom-backdrop{
+    position:fixed;inset:0;z-index:1999;
+    background:rgba(0,0,0,0);pointer-events:none;
+    transition:background .25s;
+  }
+  .gallery-zoom-backdrop.visible{background:rgba(0,0,0,.78);pointer-events:auto;cursor:zoom-out;}
 
   /* ===== K6 ORDER NOW ===== */
   .order-section{background:var(--ink);}
@@ -403,7 +441,7 @@
       </a>
 
       <div class="wa-arrow" style="top:31%;left:17.1%;">
-        <span class="wa-label">10% popusta</span>
+        <span class="wa-label">TRENUTNO SAMO PICKUP</span>
         <svg class="arrow-icon" viewBox="0 0 24 40" style="transform:rotate(120deg);" aria-hidden="true">
           <line x1="12" y1="38" x2="12" y2="10" stroke="#e2231a" stroke-width="4" stroke-linecap="round"/>
           <polygon points="12,0 22,16 2,16" fill="#e2231a"/>
@@ -411,7 +449,7 @@
       </div>
 
       <div class="wa-arrow" style="top:31%;left:82.9%;">
-        <span class="wa-label">najbolja opcija</span>
+        <span class="wa-label">DOSTAVA USKORO</span>
         <svg class="arrow-icon" viewBox="0 0 24 40" style="transform:rotate(240deg);" aria-hidden="true">
           <line x1="12" y1="38" x2="12" y2="10" stroke="#e2231a" stroke-width="4" stroke-linecap="round"/>
           <polygon points="12,0 22,16 2,16" fill="#e2231a"/>
@@ -509,7 +547,8 @@
 <footer class="site-footer">
   <div class="container">
     <p class="foot-brand">Magic Kebab &amp; Burger</p>
-    <p>Sesvete, Zagreb &bull; <a href="tel:+385918824850">+385 91 882 4850</a></p>
+    <p>Radno vrijeme: PON-SUB 10:00-24:00</p>
+    <p>Sesvete, Zagreb &bull; <a href="tel:+385997535734">+385 99 753 5734</a></p>
     <p style="margin-top:14px;">&copy; 2026 Magic Kebab i Burger. Sva prava pridržana.</p>
   </div>
 </footer>
@@ -577,6 +616,10 @@
 
     function render() {
       const page = pages[current] || [];
+      // zatvori povećanu sliku ako je otvorena prilikom promjene slidea
+      grid.querySelectorAll('img.is-zoomed').forEach(z => z.classList.remove('is-zoomed'));
+      const zb = document.querySelector('.gallery-zoom-backdrop');
+      if (zb) zb.classList.remove('visible');
       slots.forEach((slot, i) => {
         const img = slot.querySelector('img');
         const caption = slot.querySelector('.g-caption');
@@ -617,6 +660,51 @@
 
   initGallery('kebab');
   initGallery('burger');
+
+  // ---- K5 gallery: klik na sliku = povećanje u sredinu ekrana ----
+  // Radi samo unutar sekcije #galerija. Ponovni klik na povećanu sliku
+  // (ili na tamnu pozadinu) vraća je na normalnu veličinu.
+  (function () {
+    const section = document.getElementById('galerija');
+    if (!section) return;
+
+    const backdrop = document.createElement('div');
+    backdrop.className = 'gallery-zoom-backdrop';
+    document.body.appendChild(backdrop);
+
+    function closeZoom() {
+      section.querySelectorAll('img.is-zoomed').forEach(z => z.classList.remove('is-zoomed'));
+      backdrop.classList.remove('visible');
+    }
+
+    section.addEventListener('click', (e) => {
+      const img = e.target.closest('.gallery-grid .g-img img');
+      if (!img || !img.getAttribute('src')) return;
+      if (img.classList.contains('is-zoomed')) {
+        closeZoom();
+      } else {
+        closeZoom();
+        img.classList.add('is-zoomed');
+        backdrop.classList.add('visible');
+      }
+    });
+    backdrop.addEventListener('click', closeZoom);
+  })();
+</script>
+
+<!-- ================================================================
+     PRIVREMENA PORUKA na gumbima WOLT i GLOVO (pop-up prozor).
+     DA GA UGASITE: zakomentirajte ili obrišite cijeli ovaj skript
+     blok ispod (od njegove prve do zadnje linije). Ništa drugo se ne mijenja.
+     Kad dodate prave linkove (href) na Wolt/Glovo, obrišite ovaj blok.
+     ================================================================ -->
+<script>
+  document.querySelectorAll('.order-btn.wolt, .order-btn.glovo').forEach(function (btn) {
+    btn.addEventListener('click', function (e) {
+      e.preventDefault();
+      alert('Tekst ovdje napisi 123zz');
+    });
+  });
 </script>
 </body>
 </html>
